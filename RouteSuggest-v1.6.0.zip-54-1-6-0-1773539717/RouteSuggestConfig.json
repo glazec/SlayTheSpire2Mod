@@ -1,0 +1,32 @@
+{
+  "schema_version": 2,
+  "highlight_type": "All",
+  "path_configs": [
+    {
+      "name": "Safe",
+      "color": "#ffd600",
+      "priority": 100,
+      "scoring_weights": {
+        "RestSite": 1,
+        "Treasure": 1,
+        "Shop": 1,
+        "Monster": -1,
+        "Elite": -3,
+        "Unknown": 0
+      }
+    },
+    {
+      "name": "Aggressive",
+      "color": "#ff0000",
+      "priority": 50,
+      "scoring_weights": {
+        "RestSite": 1,
+        "Treasure": 1,
+        "Shop": 1,
+        "Monster": 2,
+        "Elite": 3,
+        "Unknown": 2
+      }
+    }
+  ]
+}
