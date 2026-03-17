@@ -32,6 +32,7 @@ fi
 rm -f "$SUPPORT_DIR/STS2-mods-check-wrapper.sh"
 rm -f "$SUPPORT_DIR/wrapper-installed"
 rm -f "$SUPPORT_DIR/repo-path"
+rm -f "$SUPPORT_DIR/game-binary.info"
 if [[ -d "$SUPPORT_DIR" ]] && [[ -z "$(ls -A "$SUPPORT_DIR" 2>/dev/null)" ]]; then
   rmdir "$SUPPORT_DIR" 2>/dev/null || true
 fi

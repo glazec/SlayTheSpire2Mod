@@ -34,7 +34,7 @@ if [[ -f "$PLIST" ]]; then
   launchctl unload "$PLIST" 2>/dev/null || true
   rm -f "$PLIST"
 fi
-rm -f "$SUPPORT_DIR/STS2-mods-check-wrapper.sh" "$SUPPORT_DIR/wrapper-installed" "$SUPPORT_DIR/repo-path"
+rm -f "$SUPPORT_DIR/STS2-mods-check-wrapper.sh" "$SUPPORT_DIR/wrapper-installed" "$SUPPORT_DIR/repo-path" "$SUPPORT_DIR/game-binary.info"
 if [[ -d "$SUPPORT_DIR" ]] && [[ -z "$(ls -A "$SUPPORT_DIR" 2>/dev/null)" ]]; then
   rmdir "$SUPPORT_DIR" 2>/dev/null || true
 fi
@@ -57,21 +57,39 @@ echo "$BINARY_PATH" > "$SUPPORT_DIR/wrapper-installed"
 cat > "$BINARY_PATH" << 'WRAPPER_EOF'
 #!/usr/bin/env bash
 # SlayTheSpire2Mod wrapper
-REPO_PATH_FILE="$HOME/Library/Application Support/SlayTheSpire2Mod/repo-path"
+SUPPORT_DIR="$HOME/Library/Application Support/SlayTheSpire2Mod"
+CHECK_SCRIPT="$SUPPORT_DIR/STS2-mods-check-wrapper.sh"
+[[ -x "$CHECK_SCRIPT" ]] && "$CHECK_SCRIPT" || true
+BINARY_NAME="BINARY_PLACEHOLDER"
+REAL_PATH="$(dirname "$0")/${BINARY_NAME}.real"
+INFO_FILE="$SUPPORT_DIR/game-binary.info"
+if [[ -f "$INFO_FILE" ]]; then
+  if [[ ! -f "$REAL_PATH" ]]; then
+    osascript -e 'display notification "Game was updated. Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo, then start the game again." with title "Slay the Spire 2 Mods"'
+    exit 1
+  fi
+  SAVED=$(cat "$INFO_FILE")
+  CURRENT=$(stat -f '%m %z' "$REAL_PATH" 2>/dev/null || true)
+  if [[ "$SAVED" != "$CURRENT" ]]; then
+    osascript -e 'display notification "Game was updated. Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo, then start the game again." with title "Slay the Spire 2 Mods"'
+    exit 1
+  fi
+fi
+REPO_PATH_FILE="$SUPPORT_DIR/repo-path"
 if [[ -f "$REPO_PATH_FILE" ]]; then
   REPO_PATH=$(cat "$REPO_PATH_FILE")
   if [[ -x "$REPO_PATH/update-mods.sh" ]]; then
     "$REPO_PATH/update-mods.sh" || true
   fi
 fi
-BINARY_NAME="BINARY_PLACEHOLDER"
-exec "$(dirname "$0")/${BINARY_NAME}.real" "$@"
+exec "$REAL_PATH" "$@"
 WRAPPER_EOF
 
 # Replace placeholder with actual binary name
 sed -i '' "s/BINARY_PLACEHOLDER/$BINARY/" "$BINARY_PATH"
 
 chmod +x "$BINARY_PATH"
+stat -f '%m %z' "$REAL_PATH" > "$SUPPORT_DIR/game-binary.info"
 echo "Wrapper installed. Mods will update every time you launch the game."
 
 # Install check script and LaunchAgent
@@ -104,8 +122,6 @@ cat > "$PLIST" << PLIST_EOF
   </array>
   <key>RunAtLoad</key>
   <true/>
-  <key>StartInterval</key>
-  <integer>86400</integer>
 </dict>
 </plist>
 PLIST_EOF
