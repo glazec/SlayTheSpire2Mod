@@ -58,17 +58,10 @@ cat > "$BINARY_PATH" << 'WRAPPER_EOF'
 #!/usr/bin/env bash
 # SlayTheSpire2Mod wrapper
 REPO_PATH_FILE="$HOME/Library/Application Support/SlayTheSpire2Mod/repo-path"
-LAST_RUN_FILE=""
 if [[ -f "$REPO_PATH_FILE" ]]; then
   REPO_PATH=$(cat "$REPO_PATH_FILE")
-  LAST_RUN_FILE="$REPO_PATH/.last-mod-update"
-  TODAY=$(date +%Y-%m-%d)
-  if [[ -z "$LAST_RUN_FILE" ]] || [[ ! -f "$LAST_RUN_FILE" ]] || [[ "$(cat "$LAST_RUN_FILE")" != "$TODAY" ]]; then
-    if [[ -x "$REPO_PATH/update-mods.sh" ]]; then
-      if "$REPO_PATH/update-mods.sh"; then
-        echo "$TODAY" > "$LAST_RUN_FILE"
-      fi
-    fi
+  if [[ -x "$REPO_PATH/update-mods.sh" ]]; then
+    "$REPO_PATH/update-mods.sh" || true
   fi
 fi
 BINARY_NAME="BINARY_PLACEHOLDER"
@@ -79,7 +72,7 @@ WRAPPER_EOF
 sed -i '' "s/BINARY_PLACEHOLDER/$BINARY/" "$BINARY_PATH"
 
 chmod +x "$BINARY_PATH"
-echo "Wrapper installed. First launch each day will run the mod updater."
+echo "Wrapper installed. Mods will update every time you launch the game."
 
 # Install check script and LaunchAgent
 CHECK_SCRIPT="$SUPPORT_DIR/STS2-mods-check-wrapper.sh"
@@ -120,4 +113,4 @@ PLIST_EOF
 launchctl unload "$PLIST" 2>/dev/null || true
 launchctl load "$PLIST"
 echo "Background check installed: you'll get a notification if Steam overwrites the wrapper."
-echo "Done. Open Slay the Spire 2 as usual; mods will update on first launch each day."
+echo "Done. Open Slay the Spire 2 as usual; mods will update every time you launch."

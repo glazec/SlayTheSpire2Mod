@@ -30,7 +30,7 @@ It will:
 
 ## Auto-update mods when you launch the game
 
-You can have mods update **once per day** on the first time you open Slay the Spire 2, without running any script yourself.
+You can have mods update **every time** you open Slay the Spire 2, without running any script yourself.
 
 1. **One-time setup:** From this repo, run:
    ```bash
@@ -39,7 +39,7 @@ You can have mods update **once per day** on the first time you open Slay the Sp
    ```
    This installs a small wrapper inside the game app and a background check that runs at login. If you update this repo and want the latest wrapper behaviour, just run `./install-mod-wrapper.sh` again (it uninstalls the old wrapper first, then installs the new one).
 
-2. **After that:** Open Slay the Spire 2 as usual (Steam, Dock, Spotlight). The first launch each day will run the mod updater, then start the game.
+2. **After that:** Open Slay the Spire 2 as usual (Steam, Dock, Spotlight). Each launch will run the mod updater, then start the game.
 
 3. **If Steam updates the game:** Steam may overwrite the wrapper. You’ll get a notification: *"Slay the Spire 2 mod auto-update was removed (e.g. by a Steam update). Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo to restore."* Run `./install-mod-wrapper.sh` again to restore it.
 
@@ -59,5 +59,5 @@ You can have mods update **once per day** on the first time you open Slay the Sp
 
 - `mods/` — Mod folders (each mod in its own directory). These are what get copied into the game.
 - `update-mods.sh` — Script that pulls and syncs mods to the game path.
-- `install-mod-wrapper.sh` — Installs the in-app wrapper (auto-update on first launch each day). Re-run after pulling repo updates to get the latest wrapper.
+- `install-mod-wrapper.sh` — Installs the in-app wrapper (mods update every time you launch the game). Re-run after pulling repo updates to get the latest wrapper.
 - `uninstall-mod-wrapper.sh` — Removes the auto-update wrapper and restores the original game executable.
