@@ -6,7 +6,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_MODS="${SCRIPT_DIR}/mods"
 
 echo "1. Pulling latest mods..."
-git pull
+BRANCH=$(git branch --show-current)
+git pull origin "$BRANCH"
 
 echo "2. Ensuring mods path exists..."
 if [[ ! -d "$MODS_PATH" ]]; then
