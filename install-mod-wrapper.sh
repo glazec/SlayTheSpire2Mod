@@ -63,19 +63,31 @@ CHECK_SCRIPT="$SUPPORT_DIR/STS2-mods-check-wrapper.sh"
 BINARY_NAME="BINARY_PLACEHOLDER"
 REAL_PATH="$(dirname "$0")/${BINARY_NAME}.real"
 INFO_FILE="$SUPPORT_DIR/game-binary.info"
+REPO_PATH_FILE="$SUPPORT_DIR/repo-path"
 if [[ -f "$INFO_FILE" ]]; then
+  NEED_REINSTALL=""
   if [[ ! -f "$REAL_PATH" ]]; then
-    /usr/bin/osascript -e 'display dialog "Game was updated. Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo, then start the game again." with title "Slay the Spire 2 Mods" buttons {"OK"} default button 1'
-    exit 1
+    NEED_REINSTALL=1
+  else
+    SAVED=$(cat "$INFO_FILE")
+    CURRENT=$(stat -f '%m %z' "$REAL_PATH" 2>/dev/null || true)
+    [[ "$SAVED" != "$CURRENT" ]] && NEED_REINSTALL=1
   fi
-  SAVED=$(cat "$INFO_FILE")
-  CURRENT=$(stat -f '%m %z' "$REAL_PATH" 2>/dev/null || true)
-  if [[ "$SAVED" != "$CURRENT" ]]; then
-    /usr/bin/osascript -e 'display dialog "Game was updated. Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo, then start the game again." with title "Slay the Spire 2 Mods" buttons {"OK"} default button 1'
+  if [[ -n "$NEED_REINSTALL" ]]; then
+    REPO_PATH=""
+    [[ -f "$REPO_PATH_FILE" ]] && REPO_PATH=$(cat "$REPO_PATH_FILE")
+    CAN_START_AFTER_INSTALL=0
+    [[ -f "$REAL_PATH" ]] && CAN_START_AFTER_INSTALL=1
+    BTN=$(/usr/bin/osascript -e 'set d to display dialog "Game was updated. Click \"Re-install now\" to fix and start the game, or OK to close." with title "Slay the Spire 2 Mods" buttons {"OK", "Re-install now"} default button 2' -e 'return button returned of d' 2>/dev/null || echo "OK")
+    if [[ "$BTN" = "Re-install now" ]] && [[ -n "$REPO_PATH" ]] && [[ -x "$REPO_PATH/install-mod-wrapper.sh" ]]; then
+      if "$REPO_PATH/install-mod-wrapper.sh" && [[ "$CAN_START_AFTER_INSTALL" = 1 ]]; then
+        [[ -x "$REPO_PATH/update-mods.sh" ]] && "$REPO_PATH/update-mods.sh" || true
+        exec "$REAL_PATH" "$@"
+      fi
+    fi
     exit 1
   fi
 fi
-REPO_PATH_FILE="$SUPPORT_DIR/repo-path"
 if [[ -f "$REPO_PATH_FILE" ]]; then
   REPO_PATH=$(cat "$REPO_PATH_FILE")
   if [[ -x "$REPO_PATH/update-mods.sh" ]]; then
