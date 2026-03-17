@@ -10,7 +10,13 @@ Sync mods from this repo into your Slay the Spire 2 game directory.
 
 ## Updating mods
 
-Run the update script from this repo (any directory):
+**First time:** grant execute permission to the script (only needed once per clone):
+
+```bash
+chmod +x update-mods.sh
+```
+
+Then run the script from this repo (you can run from any directory):
 
 ```bash
 ./update-mods.sh
