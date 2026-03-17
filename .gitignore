@@ -1,1 +1,8 @@
 .last-mod-update
+.github
+.vscode
+.cursor
+.cursorignore
+.cursorrules
+.cursorignore
+.DS_Store
