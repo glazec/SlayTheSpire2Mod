@@ -65,13 +65,13 @@ REAL_PATH="$(dirname "$0")/${BINARY_NAME}.real"
 INFO_FILE="$SUPPORT_DIR/game-binary.info"
 if [[ -f "$INFO_FILE" ]]; then
   if [[ ! -f "$REAL_PATH" ]]; then
-    osascript -e 'display notification "Game was updated. Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo, then start the game again." with title "Slay the Spire 2 Mods"'
+    /usr/bin/osascript -e 'display dialog "Game was updated. Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo, then start the game again." with title "Slay the Spire 2 Mods" buttons {"OK"} default button 1'
     exit 1
   fi
   SAVED=$(cat "$INFO_FILE")
   CURRENT=$(stat -f '%m %z' "$REAL_PATH" 2>/dev/null || true)
   if [[ "$SAVED" != "$CURRENT" ]]; then
-    osascript -e 'display notification "Game was updated. Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo, then start the game again." with title "Slay the Spire 2 Mods"'
+    /usr/bin/osascript -e 'display dialog "Game was updated. Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo, then start the game again." with title "Slay the Spire 2 Mods" buttons {"OK"} default button 1'
     exit 1
   fi
 fi
