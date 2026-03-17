@@ -22,18 +22,24 @@ fi
 BINARY=$(/usr/libexec/PlistBuddy -c "Print :CFBundleExecutable" "$INFO_PLIST")
 BINARY_PATH="$MACOS_DIR/$BINARY"
 REAL_PATH="$MACOS_DIR/$BINARY.real"
+PLIST="$HOME/Library/LaunchAgents/com.slaythespire2mod.checkwrapper.plist"
 
-# Already wrapped?
-if [[ -f "$BINARY_PATH" ]]; then
-  if head -1 "$BINARY_PATH" | grep -q '^#!'; then
-    if grep -q "$WRAPPER_MAGIC" "$BINARY_PATH" 2>/dev/null; then
-      echo "Wrapper already installed. Re-run this script after a Steam update if the game overwrote it."
-      exit 0
-    fi
-  fi
+# Uninstall existing wrapper first so we always install the latest version
+if [[ -f "$REAL_PATH" ]]; then
+  echo "Removing existing wrapper..."
+  cp "$REAL_PATH" "$BINARY_PATH"
+  rm -f "$REAL_PATH"
+fi
+if [[ -f "$PLIST" ]]; then
+  launchctl unload "$PLIST" 2>/dev/null || true
+  rm -f "$PLIST"
+fi
+rm -f "$SUPPORT_DIR/STS2-mods-check-wrapper.sh" "$SUPPORT_DIR/wrapper-installed" "$SUPPORT_DIR/repo-path"
+if [[ -d "$SUPPORT_DIR" ]] && [[ -z "$(ls -A "$SUPPORT_DIR" 2>/dev/null)" ]]; then
+  rmdir "$SUPPORT_DIR" 2>/dev/null || true
 fi
 
-# If .real exists but current is binary, we're likely re-installing after Steam overwrote
+# Backup real binary if not already backed up
 if [[ ! -f "$REAL_PATH" ]]; then
   if [[ ! -f "$BINARY_PATH" ]]; then
     echo "Error: Executable not found: $BINARY_PATH" >&2
@@ -59,8 +65,9 @@ if [[ -f "$REPO_PATH_FILE" ]]; then
   TODAY=$(date +%Y-%m-%d)
   if [[ -z "$LAST_RUN_FILE" ]] || [[ ! -f "$LAST_RUN_FILE" ]] || [[ "$(cat "$LAST_RUN_FILE")" != "$TODAY" ]]; then
     if [[ -x "$REPO_PATH/update-mods.sh" ]]; then
-      "$REPO_PATH/update-mods.sh" || true
-      echo "$TODAY" > "$LAST_RUN_FILE"
+      if "$REPO_PATH/update-mods.sh"; then
+        echo "$TODAY" > "$LAST_RUN_FILE"
+      fi
     fi
   fi
 fi
@@ -91,7 +98,6 @@ exit 0
 CHECK_EOF
 chmod +x "$CHECK_SCRIPT"
 
-PLIST="$HOME/Library/LaunchAgents/com.slaythespire2mod.checkwrapper.plist"
 cat > "$PLIST" << PLIST_EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
