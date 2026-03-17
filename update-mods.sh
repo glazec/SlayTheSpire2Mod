@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-MODS_PATH="$HOME/Library/Application Support/Steam/steamapps/common/Slay the Spire 2/SlayTheSpire2.app/Contents/MacOS/mods"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+MODS_PATH="$HOME/Library/Application Support/Steam/steamapps/common/Slay the Spire 2/SlayTheSpire2.app/Contents/MacOS/mods"
 SOURCE_MODS="${SCRIPT_DIR}/mods"
 
 echo "1. Pulling latest mods..."
