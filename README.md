@@ -43,6 +43,13 @@ You can have mods update **once per day** on the first time you open Slay the Sp
 
 3. **If Steam updates the game:** Steam may overwrite the wrapper. You’ll get a notification: *"Slay the Spire 2 mod auto-update was removed (e.g. by a Steam update). Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo to restore."* Run `./install-mod-wrapper.sh` again to restore it.
 
+4. **Uninstall:** To remove the auto-update feature and restore the original game executable, run:
+   ```bash
+   chmod +x uninstall-mod-wrapper.sh
+   ./uninstall-mod-wrapper.sh
+   ```
+   This restores the game binary, removes the LaunchAgent, and deletes the support files. You can still run `./update-mods.sh` manually.
+
 ## Requirements
 
 - **Git** — For pulling updates.
@@ -53,3 +60,4 @@ You can have mods update **once per day** on the first time you open Slay the Sp
 - `mods/` — Mod folders (each mod in its own directory). These are what get copied into the game.
 - `update-mods.sh` — Script that pulls and syncs mods to the game path.
 - `install-mod-wrapper.sh` — One-time installer for the in-app wrapper (auto-update on first launch each day).
+- `uninstall-mod-wrapper.sh` — Removes the auto-update wrapper and restores the original game executable.

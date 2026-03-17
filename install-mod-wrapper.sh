@@ -75,7 +75,7 @@ chmod +x "$BINARY_PATH"
 echo "Wrapper installed. First launch each day will run the mod updater."
 
 # Install check script and LaunchAgent
-CHECK_SCRIPT="$SUPPORT_DIR/check-wrapper.sh"
+CHECK_SCRIPT="$SUPPORT_DIR/STS2-mods-check-wrapper.sh"
 cat > "$CHECK_SCRIPT" << 'CHECK_EOF'
 #!/usr/bin/env bash
 MARKER="$HOME/Library/Application Support/SlayTheSpire2Mod/wrapper-installed"
