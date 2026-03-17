@@ -78,7 +78,7 @@ if [[ -f "$INFO_FILE" ]]; then
     [[ -f "$REPO_PATH_FILE" ]] && REPO_PATH=$(cat "$REPO_PATH_FILE")
     CAN_START_AFTER_INSTALL=0
     [[ -f "$REAL_PATH" ]] && CAN_START_AFTER_INSTALL=1
-    BTN=$(/usr/bin/osascript -e 'set d to display dialog "Game was updated. Click \"Re-install now\" to fix and start the game, or OK to close." with title "Slay the Spire 2 Mods" buttons {"OK", "Re-install now"} default button 2' -e 'return button returned of d' 2>/dev/null || echo "OK")
+    BTN=$(/usr/bin/osascript -e 'set d to display dialog "Game was updated. Click \"Re-install now\" to fix and start the game, or OK to close." with title "Slay the Spire 2 Mods Auto Sync" buttons {"OK", "Re-install now"} default button 2' -e 'return button returned of d' 2>/dev/null || echo "OK")
     if [[ "$BTN" = "Re-install now" ]] && [[ -n "$REPO_PATH" ]] && [[ -x "$REPO_PATH/install-mod-wrapper.sh" ]]; then
       if "$REPO_PATH/install-mod-wrapper.sh" && [[ "$CAN_START_AFTER_INSTALL" = 1 ]]; then
         [[ -x "$REPO_PATH/update-mods.sh" ]] && "$REPO_PATH/update-mods.sh" || true
