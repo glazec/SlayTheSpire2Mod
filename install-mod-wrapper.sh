@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+set -e
+
+APP_PATH="$HOME/Library/Application Support/Steam/steamapps/common/Slay the Spire 2/SlayTheSpire2.app"
+MACOS_DIR="$APP_PATH/Contents/MacOS"
+INFO_PLIST="$APP_PATH/Contents/Info.plist"
+SUPPORT_DIR="$HOME/Library/Application Support/SlayTheSpire2Mod"
+WRAPPER_MAGIC="SlayTheSpire2Mod wrapper"
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ ! -d "$APP_PATH" ]]; then
+  echo "Error: Slay the Spire 2 app not found at: $APP_PATH" >&2
+  exit 1
+fi
+
+if [[ ! -f "$INFO_PLIST" ]]; then
+  echo "Error: Info.plist not found at: $INFO_PLIST" >&2
+  exit 1
+fi
+
+BINARY=$(/usr/libexec/PlistBuddy -c "Print :CFBundleExecutable" "$INFO_PLIST")
+BINARY_PATH="$MACOS_DIR/$BINARY"
+REAL_PATH="$MACOS_DIR/$BINARY.real"
+
+# Already wrapped?
+if [[ -f "$BINARY_PATH" ]]; then
+  if head -1 "$BINARY_PATH" | grep -q '^#!'; then
+    if grep -q "$WRAPPER_MAGIC" "$BINARY_PATH" 2>/dev/null; then
+      echo "Wrapper already installed. Re-run this script after a Steam update if the game overwrote it."
+      exit 0
+    fi
+  fi
+fi
+
+# If .real exists but current is binary, we're likely re-installing after Steam overwrote
+if [[ ! -f "$REAL_PATH" ]]; then
+  if [[ ! -f "$BINARY_PATH" ]]; then
+    echo "Error: Executable not found: $BINARY_PATH" >&2
+    exit 1
+  fi
+  echo "Backing up real binary to $BINARY.real"
+  cp "$BINARY_PATH" "$REAL_PATH"
+fi
+
+echo "Installing wrapper as $BINARY"
+mkdir -p "$SUPPORT_DIR"
+echo "$REPO_DIR" > "$SUPPORT_DIR/repo-path"
+echo "$BINARY_PATH" > "$SUPPORT_DIR/wrapper-installed"
+
+cat > "$BINARY_PATH" << 'WRAPPER_EOF'
+#!/usr/bin/env bash
+# SlayTheSpire2Mod wrapper
+REPO_PATH_FILE="$HOME/Library/Application Support/SlayTheSpire2Mod/repo-path"
+LAST_RUN_FILE=""
+if [[ -f "$REPO_PATH_FILE" ]]; then
+  REPO_PATH=$(cat "$REPO_PATH_FILE")
+  LAST_RUN_FILE="$REPO_PATH/.last-mod-update"
+  TODAY=$(date +%Y-%m-%d)
+  if [[ -z "$LAST_RUN_FILE" ]] || [[ ! -f "$LAST_RUN_FILE" ]] || [[ "$(cat "$LAST_RUN_FILE")" != "$TODAY" ]]; then
+    if [[ -x "$REPO_PATH/update-mods.sh" ]]; then
+      "$REPO_PATH/update-mods.sh" || true
+      echo "$TODAY" > "$LAST_RUN_FILE"
+    fi
+  fi
+fi
+BINARY_NAME="BINARY_PLACEHOLDER"
+exec "$(dirname "$0")/${BINARY_NAME}.real" "$@"
+WRAPPER_EOF
+
+# Replace placeholder with actual binary name
+sed -i '' "s/BINARY_PLACEHOLDER/$BINARY/" "$BINARY_PATH"
+
+chmod +x "$BINARY_PATH"
+echo "Wrapper installed. First launch each day will run the mod updater."
+
+# Install check script and LaunchAgent
+CHECK_SCRIPT="$SUPPORT_DIR/check-wrapper.sh"
+cat > "$CHECK_SCRIPT" << 'CHECK_EOF'
+#!/usr/bin/env bash
+MARKER="$HOME/Library/Application Support/SlayTheSpire2Mod/wrapper-installed"
+[[ ! -f "$MARKER" ]] && exit 0
+EXE=$(cat "$MARKER")
+[[ ! -f "$EXE" ]] && exit 0
+if head -1 "$EXE" 2>/dev/null | grep -q '^#!'; then
+  grep -q "SlayTheSpire2Mod wrapper" "$EXE" 2>/dev/null && exit 0
+fi
+osascript -e 'display notification "Slay the Spire 2 mod auto-update was removed (e.g. by a Steam update). Re-run install-mod-wrapper.sh from the SlayTheSpire2Mod repo to restore." with title "Slay the Spire 2 Mods"'
+rm -f "$MARKER"
+exit 0
+CHECK_EOF
+chmod +x "$CHECK_SCRIPT"
+
+PLIST="$HOME/Library/LaunchAgents/com.slaythespire2mod.checkwrapper.plist"
+cat > "$PLIST" << PLIST_EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.slaythespire2mod.checkwrapper</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>$CHECK_SCRIPT</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StartInterval</key>
+  <integer>86400</integer>
+</dict>
+</plist>
+PLIST_EOF
+
+launchctl unload "$PLIST" 2>/dev/null || true
+launchctl load "$PLIST"
+echo "Background check installed: you'll get a notification if Steam overwrites the wrapper."
+echo "Done. Open Slay the Spire 2 as usual; mods will update on first launch each day."
