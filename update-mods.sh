@@ -23,7 +23,6 @@ echo "3. Copying mods (overwriting existing)..."
 if [[ -d "$SOURCE_MODS" ]]; then
   rsync -a --delete "$SOURCE_MODS/" "$MODS_PATH/"
   echo "Done. Mods copied to: $MODS_PATH"
-  osascript -e 'display notification "Mods updated to game folder." with title "Slay the Spire 2 Mods"'
 else
   echo "Error: Source mods directory not found: $SOURCE_MODS" >&2
   exit 1
