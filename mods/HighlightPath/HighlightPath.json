@@ -1,0 +1,12 @@
+{
+  "id": "HighlightPath",
+  "pck_name": "HighlightPath",
+  "name": "HighlightPath",
+  "author": "Snowline",
+  "description": "还原 1 代 HighlightPath 经典体验！右键点击即可高亮标记地图节点，且与 2 代自带的画笔系统完美共存。\n\nInspired by the classic StS1 HighlightPath mod! Right-click to highlight map nodes instantly. Fully compatible and coexists seamlessly with the native StS2 drawing brush.",
+  "version": "v1.3",
+  "has_pck": true,
+  "has_dll": true,
+  "dependencies": [],
+  "affects_gameplay": true
+}
