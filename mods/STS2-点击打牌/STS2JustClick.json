@@ -1,0 +1,11 @@
+{
+  "id": "STS2JustClick",
+  "name": "STS2-点击打牌",
+  "author": "河童Guru",
+  "description": "当无需选择目标时，点击牌面即可出牌",
+  "version": "2.2.5",
+  "has_pck": false,
+  "has_dll": true,
+  "dependencies": [],
+  "affects_gameplay": false
+}

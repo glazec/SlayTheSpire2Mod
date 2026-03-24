@@ -3,7 +3,7 @@
   "name": "BetterSpire2",
   "author": "jdr",
   "description": "QoL mod: incoming damage totals, multi-hit labels, hand viewer, hold-R restart, skip splash, multiplayer kick/scaling",
-  "version": "v1.63",
+  "version": "v1.68",
   "has_pck": false,
   "has_dll": true,
   "dependencies": [],
