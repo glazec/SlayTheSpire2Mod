@@ -1,0 +1,11 @@
+﻿{
+  "id": "PlayerColors",
+  "name": "PlayerColors",
+  "author": "Masaicker",
+  "description": "Distinguish players by color when sharing the same character in multiplayer. \n多人模式下使用相同角色时，通过颜色区分玩家。",
+  "version": "v1.0.3",
+  "has_dll": true,
+  "has_pck": false,
+  "dependencies": [],
+  "affects_gameplay": false
+}

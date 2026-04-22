@@ -1,0 +1,10 @@
+{
+  "id": "RelicsReminder",
+  "name": "Relics Reminder",
+  "author": "CheeseFox",
+  "description": "Remind your relics",
+  "version": "0.1.0",
+  "has_dll": true,
+  "has_pck": false,
+  "affects_gameplay": false
+}

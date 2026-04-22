@@ -1,0 +1,11 @@
+{
+  "id": "card_tier_icons",
+  "name": "Card Tier Icons",
+  "author": "caseyvangroll",
+  "description": "Adds a small icon indicating tier (S/A/B/C/D/?) for each card, sourced from mobalytics.gg but configurable by user",
+  "version": "v1.2.1",
+  "has_pck": false,
+  "has_dll": true,
+  "dependencies": [],
+  "affects_gameplay": false
+}
